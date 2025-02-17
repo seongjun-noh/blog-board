@@ -5,9 +5,9 @@ spring:
   application:
     name: blog-board
   datasource:
-    url: jdbc:mysql://localhost:3305/blog_board?serverTimezone=Asia/Seoul
-    username: root
-    password: passwd
+    url: jdbc:mysql://localhost:3306/blog_board?serverTimezone=Asia/Seoul
+    username: bloguser
+    password: blogpass
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
