@@ -5,9 +5,9 @@ spring:
   application:
     name: blog-board
   datasource:
-    url: jdbc:mysql://localhost:3306/blog_board?serverTimezone=Asia/Seoul
-    username: bloguser
-    password: blogpass
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -16,3 +16,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  accessTokenExpiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  refreshTokenExpiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
