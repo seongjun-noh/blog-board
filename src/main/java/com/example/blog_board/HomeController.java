@@ -8,7 +8,7 @@ import com.example.blog_board.common.dto.ApiResponse;
 @RestController
 public class HomeController {
 
-	@GetMapping("/")
+	@GetMapping("/loginTest")
 	public ApiResponse<String> home() {
 		String message = "Hello, Blog Board!";
 

@@ -22,7 +22,7 @@ public class JwtAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        return this.principalDetails.getUsername();
+        return this.principalDetails.getEmail();
     }
 
     @Override
