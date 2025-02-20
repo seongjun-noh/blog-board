@@ -17,17 +17,22 @@ import lombok.Getter;
 public class PrincipalDetails implements UserDetails {
 	private final Long id;
 	private final UserRole role;
-	private final String username;
+	private final String email;
 
 	public PrincipalDetails(Long id, UserRole role, String username) {
 		this.id = id;
 		this.role = role;
-		this.username = username;
+		this.email = username;
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of(new SimpleGrantedAuthority(role.name()));
+	}
+
+	@Override
+	public String getUsername() {
+		return this.email;
 	}
 
 	@Override

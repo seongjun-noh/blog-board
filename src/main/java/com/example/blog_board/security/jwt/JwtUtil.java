@@ -38,7 +38,7 @@ public class JwtUtil {
         Date expiryDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION);
 
         return Jwts.builder()
-            .setSubject(principalDetails.getUsername())
+            .setSubject(principalDetails.getEmail())
             .claim("id", principalDetails.getId())
             .claim("role", principalDetails.getRole())
             .setIssuedAt(now)                           // 토큰 발급 시간(iat)
@@ -53,7 +53,7 @@ public class JwtUtil {
         Date expiryDate = new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION);
 
         return Jwts.builder()
-            .setSubject(principalDetails.getUsername())
+            .setSubject(principalDetails.getEmail())
             .claim("id", principalDetails.getId())
             .setIssuedAt(now)
             .setExpiration(expiryDate)

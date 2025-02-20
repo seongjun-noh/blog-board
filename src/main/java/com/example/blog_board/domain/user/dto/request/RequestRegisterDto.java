@@ -1,4 +1,4 @@
-package com.example.blog_board.domain.user.dto;
+package com.example.blog_board.domain.user.dto.request;
 
 import com.example.blog_board.common.validation.annotation.ValidPassword;
 

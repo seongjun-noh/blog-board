@@ -33,13 +33,14 @@ public class JwtFilter extends OncePerRequestFilter {
                 Claims body = jwtUtil.getBody(token);
 
                 Long id = body.get("id", Long.class);
-                UserRole role = body.get("role", UserRole.class);
+                String roleStr = body.get("role", String.class);
+                UserRole role = UserRole.valueOf(roleStr);
                 String username = body.getSubject();
 
                 PrincipalDetails principalDetails = PrincipalDetails.builder()
                         .id(id)
                         .role(role)
-                        .username(username)
+                        .email(username)
                         .build();
 
                 Authentication authentication = new JwtAuthentication(principalDetails);
