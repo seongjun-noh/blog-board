@@ -14,5 +14,6 @@ security:
   permit-urls:
     - /register
     - /login
+    - /refresh
   deny-urls:
 #    - /admin/**
