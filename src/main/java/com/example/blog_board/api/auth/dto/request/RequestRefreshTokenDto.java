@@ -1,4 +1,4 @@
-package com.example.blog_board.domain.user.dto.request;
+package com.example.blog_board.api.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestLogoutDto {
+public class RequestRefreshTokenDto {
 	@NotBlank(message = "refreshToken is required.")
 	private String refreshToken;
 }

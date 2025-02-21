@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.blog_board.common.enums.UserRole;
-import com.example.blog_board.domain.redis.redis.RedisService;
+import com.example.blog_board.service.redis.RedisService;
 import com.example.blog_board.security.details.PrincipalDetails;
 
 import io.jsonwebtoken.Claims;

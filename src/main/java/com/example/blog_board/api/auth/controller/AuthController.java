@@ -1,16 +1,18 @@
-package com.example.blog_board.domain.user.controller;
+package com.example.blog_board.api.auth.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.blog_board.common.dto.ApiResponse;
-import com.example.blog_board.domain.user.dto.request.RequestLogoutDto;
-import com.example.blog_board.domain.user.dto.request.RequestRefreshTokenDto;
-import com.example.blog_board.domain.user.dto.request.RequestLoginDto;
-import com.example.blog_board.domain.user.dto.request.RequestRegisterDto;
-import com.example.blog_board.domain.user.service.UserService;
+import com.example.blog_board.api.auth.dto.request.RequestLogoutDto;
+import com.example.blog_board.api.auth.dto.request.RequestRefreshTokenDto;
+import com.example.blog_board.api.auth.dto.request.RequestLoginDto;
+import com.example.blog_board.api.auth.dto.request.RequestRegisterDto;
+import com.example.blog_board.service.auth.AuthService;
 import com.example.blog_board.security.details.PrincipalDetails;
 import com.example.blog_board.security.jwt.JwtDto;
 
@@ -20,19 +22,27 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController {
-	private final UserService userService;
+@RequestMapping("/api/auth")
+public class AuthController {
+	private final AuthService authService;
+
+	@GetMapping("/loginTest")
+	public ApiResponse<String> home() {
+		String message = "Hello, Blog Board!";
+
+		return ApiResponse.success(message);
+	}
 
 	@PostMapping("/register")
 	public ApiResponse register(@Valid @RequestBody RequestRegisterDto requestBody) {
-		userService.register(requestBody);
+		authService.register(requestBody);
 
 		return ApiResponse.success("register");
 	}
 
 	@PostMapping("/login")
 	public ApiResponse<JwtDto> login(@Valid @RequestBody RequestLoginDto request) {
-		JwtDto response = userService.login(request);
+		JwtDto response = authService.login(request);
 
 		return ApiResponse.success(response);
 	}
@@ -48,14 +58,14 @@ public class UserController {
 		// 사용자 정보 추출
 		String email = principalDetails.getEmail();
 
-		userService.logout(email, accessToken, requestBody.getRefreshToken());
+		authService.logout(email, accessToken, requestBody.getRefreshToken());
 
 		return ApiResponse.success("logout");
 	}
 
 	@PostMapping("/refresh")
 	public ApiResponse<JwtDto> refresh(@Valid @RequestBody RequestRefreshTokenDto request) {
-		JwtDto response = userService.refresh(request);
+		JwtDto response = authService.refresh(request);
 
 		return ApiResponse.success(response);
 	}

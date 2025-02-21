@@ -1,4 +1,4 @@
-package com.example.blog_board.domain.user.service;
+package com.example.blog_board.service.auth;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blog_board.common.enums.UserRole;
-import com.example.blog_board.domain.redis.redis.RedisService;
-import com.example.blog_board.domain.user.dto.request.RequestLoginDto;
-import com.example.blog_board.domain.user.dto.request.RequestRefreshTokenDto;
-import com.example.blog_board.domain.user.dto.request.RequestRegisterDto;
+import com.example.blog_board.service.redis.RedisService;
+import com.example.blog_board.api.auth.dto.request.RequestLoginDto;
+import com.example.blog_board.api.auth.dto.request.RequestRefreshTokenDto;
+import com.example.blog_board.api.auth.dto.request.RequestRegisterDto;
 import com.example.blog_board.domain.user.entity.UserEntity;
 import com.example.blog_board.domain.user.repository.UserRepository;
 import com.example.blog_board.security.details.PrincipalDetails;
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class AuthService {
 	private final RedisService redisService;
 	private final UserRepository userRepository;
 	private final JwtUtil jwtUtil;

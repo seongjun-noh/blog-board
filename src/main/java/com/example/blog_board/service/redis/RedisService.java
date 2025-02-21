@@ -1,4 +1,4 @@
-package com.example.blog_board.domain.redis.redis;
+package com.example.blog_board.service.redis;
 
 import java.util.concurrent.TimeUnit;
 
