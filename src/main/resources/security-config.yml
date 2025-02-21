@@ -12,8 +12,8 @@ security:
     allow-credentials: true
 
   permit-urls:
-    - /register
-    - /login
-    - /refresh
+    - /api/auth/register
+    - /api/auth/login
+    - /api/auth/refresh
   deny-urls:
 #    - /admin/**
