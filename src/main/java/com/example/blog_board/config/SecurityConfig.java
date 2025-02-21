@@ -12,7 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.blog_board.security.jwt.JwtFilter;
-import com.example.blog_board.security.jwt.JwtUtil;
 import com.example.blog_board.security.properties.SecurityProperties;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 	private final SecurityProperties securityProperties;
-	private final JwtUtil jwtUtil;
+	private final JwtFilter jwtFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,7 +38,7 @@ public class SecurityConfig {
 		.formLogin(AbstractHttpConfigurer::disable)
 		.logout(AbstractHttpConfigurer::disable)
 
-		.addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+		.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
@@ -47,10 +46,5 @@ public class SecurityConfig {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	public JwtFilter jwtFilter(JwtUtil jwtUtil) {
-		return new JwtFilter(jwtUtil);
 	}
 }

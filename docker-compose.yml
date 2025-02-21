@@ -15,9 +15,19 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - blog-network
+  redis:
+    image: redis:7.4.2
+    container_name: blog-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
 
 volumes:
   mysql_data:
+  redis_data:
+    driver: local
 
 networks:
   blog-network:

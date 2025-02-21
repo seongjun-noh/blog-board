@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.blog_board.common.dto.ApiResponse;
+import com.example.blog_board.domain.user.dto.request.RequestRefreshTokenDto;
 import com.example.blog_board.domain.user.dto.request.RequestLoginDto;
 import com.example.blog_board.domain.user.dto.request.RequestRegisterDto;
 import com.example.blog_board.domain.user.service.UserService;
@@ -20,7 +21,6 @@ public class UserController {
 
 	@PostMapping("/register")
 	public ApiResponse register(@Valid @RequestBody RequestRegisterDto request) {
-
 		userService.register(request);
 
 		return ApiResponse.success("register");
@@ -29,6 +29,13 @@ public class UserController {
 	@PostMapping("/login")
 	public ApiResponse<JwtDto> login(@Valid @RequestBody RequestLoginDto request) {
 		JwtDto response = userService.login(request);
+
+		return ApiResponse.success(response);
+	}
+
+	@PostMapping("/refresh")
+	public ApiResponse<JwtDto> refresh(@Valid @RequestBody RequestRefreshTokenDto request) {
+		JwtDto response = userService.refresh(request);
 
 		return ApiResponse.success(response);
 	}
