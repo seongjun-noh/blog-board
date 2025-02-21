@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blog_board.common.enums.UserRole;
 import com.example.blog_board.domain.redis.redis.RedisService;
-import com.example.blog_board.domain.user.dto.request.RequestRefreshTokenDto;
 import com.example.blog_board.domain.user.dto.request.RequestLoginDto;
+import com.example.blog_board.domain.user.dto.request.RequestRefreshTokenDto;
 import com.example.blog_board.domain.user.dto.request.RequestRegisterDto;
 import com.example.blog_board.domain.user.entity.UserEntity;
 import com.example.blog_board.domain.user.repository.UserRepository;
@@ -29,26 +29,26 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public void register(RequestRegisterDto request) {
+	public void register(RequestRegisterDto requestBody) {
 		// 이메일 중복 체크
-		boolean isExistsEmail = userRepository.existsByEmail(request.getEmail());
+		boolean isExistsEmail = userRepository.existsByEmail(requestBody.getEmail());
 		if (isExistsEmail) {
 			throw new IllegalArgumentException("Email already exists.");
 		}
 
 		// 비밀번호 확인
-		if (!request.getPassword().equals(request.getPasswordCheck())) {
+		if (!requestBody.getPassword().equals(requestBody.getPasswordCheck())) {
 			throw new IllegalArgumentException("Password does not match.");
 		}
 
 		// 비밀번호 암호화
-		String encodedPassword = passwordEncoder.encode(request.getPassword());
+		String encodedPassword = passwordEncoder.encode(requestBody.getPassword());
 
 		// 사용자 생성
 		UserEntity newUser = UserEntity.builder()
-			.email(request.getEmail())
+			.email(requestBody.getEmail())
 			.password(encodedPassword)
-			.name(request.getName())
+			.name(requestBody.getName())
 			.role(UserRole.USER)
 			.build();
 
@@ -57,13 +57,13 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public JwtDto login(RequestLoginDto request) {
+	public JwtDto login(RequestLoginDto requestBody) {
 		// 사용자 조회
-		UserEntity user = userRepository.findByEmail(request.getEmail())
+		UserEntity user = userRepository.findByEmail(requestBody.getEmail())
 			.orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
 		// 비밀번호 확인
-		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+		if (!passwordEncoder.matches(requestBody.getPassword(), user.getPassword())) {
 			throw new BadCredentialsException("Password does not match.");
 		}
 
@@ -86,9 +86,21 @@ public class UserService {
 		return new JwtDto(accessToken, refreshToken);
 	}
 
+	public void logout(String email, String accessToken, String refreshToken) {
+		// 액세스 토큰 블랙리스트 저장
+		Claims accessTokenClaims = jwtUtil.parseToken(accessToken);
+		redisService.saveBlackList(accessToken, jwtUtil.getRemainingExpirationMs(accessTokenClaims));
+
+		// 리프레쉬 토큰 삭제
+		redisService.deleteRefreshToken(email);
+		// 리프레쉬 토큰 블랙리스트 저장
+		Claims refreshTokenClaims = jwtUtil.parseToken(refreshToken);
+		redisService.saveBlackList(refreshToken, jwtUtil.getRemainingExpirationMs(refreshTokenClaims));
+	}
+
 	@Transactional(readOnly = true)
-	public JwtDto refresh(RequestRefreshTokenDto request) {
-		String oldRefreshToken = request.getRefreshToken();
+	public JwtDto refresh(RequestRefreshTokenDto requestBody) {
+		String oldRefreshToken = requestBody.getRefreshToken();
 
 		// 리프레쉬 토큰 유효성 검사
 		Claims oldRefreshTokenClaims = jwtUtil.parseToken(oldRefreshToken);
