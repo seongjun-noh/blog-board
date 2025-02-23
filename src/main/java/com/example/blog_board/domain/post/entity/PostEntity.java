@@ -1,8 +1,11 @@
 package com.example.blog_board.domain.post.entity;
 
+import java.util.List;
+
 import org.hibernate.annotations.ColumnDefault;
 
 import com.example.blog_board.common.domain.BaseEntity;
+import com.example.blog_board.domain.file.entity.PostFileEntity;
 import com.example.blog_board.domain.user.entity.UserEntity;
 
 import jakarta.persistence.Column;
@@ -13,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,11 +48,23 @@ public class PostEntity extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	private List<PostFileEntity> attachments;
+
+
 	// 글 내용을 maxLength 길이만큼 자르고 ...을 붙여 반환
 	public String getTruncateContent(int maxLength) {
 
 		return this.content.length() <= maxLength ?
 				this.content :
 				this.content.substring(0, maxLength) + "...";
+	}
+
+	public boolean hasAttachments() {
+		return this.attachments.size() > 0;
+	}
+
+	public void addViewCount() {
+		this.viewCount += 1;
 	}
 }

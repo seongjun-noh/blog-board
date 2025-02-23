@@ -41,22 +41,29 @@ public class PostService {
 		PostEntity savedPost = postRepository.save(newPost);
 
 		// 파일 저장
-		List<PostFileEntity> savedFiles = new ArrayList<>();
-		try {
-			int index = 1;
-			for (MultipartFile file : files) {
-				PostFileEntity savedFile = postFileService.saveFile(savedPost, index, file);
-				savedFiles.add(savedFile);
-				index++;
-			}
-		} catch (IOException e) {
-			// 파일 저장 실패 시
-			savedFiles.forEach(file ->
-				postFileService.deleteFile(file.getFilePath())
-			);
+		if (files != null && !files.isEmpty()) {
+			List<PostFileEntity> savedFiles = new ArrayList<>();
 
-			log.error("Failed to save files.", e);
-			throw new IllegalArgumentException("Failed to save files.");
+			try {
+				int index = 1;
+				for (MultipartFile file : files) {
+					if (file.isEmpty()) {
+						continue;
+					}
+
+					PostFileEntity savedFile = postFileService.saveFile(savedPost, index, file);
+					savedFiles.add(savedFile);
+					index++;
+				}
+			} catch (IOException e) {
+				// 파일 저장 실패 시
+				savedFiles.forEach(file ->
+					postFileService.deleteFile(file.getFilePath())
+				);
+
+				log.error("Failed to save files.", e);
+				throw new IllegalArgumentException("Failed to save files.");
+			}
 		}
 	}
 
@@ -71,16 +78,23 @@ public class PostService {
 				.userId(post.getUser().getId())
 				.userName(post.getUser().getName())
 				.viewCount(post.getViewCount())
+				.hasAttachments(post.hasAttachments())
 				.createdAt(post.getCreatedAt())
 				.updatedAt(post.getUpdatedAt())
 				.build()
 		);
 	}
 
+	@Transactional
 	public ResponsePoseDto getPost(Long postId) {
+		// 게시글 조회
 		PostEntity post = postRepository.findById(postId)
 			.orElseThrow(() -> new IllegalStateException("Post not found."));
 
+		// 조회수 증가
+		post.addViewCount();
+		postRepository.save(post);
+		
 		return ResponsePoseDto.builder()
 			.id(post.getId())
 			.title(post.getTitle())
@@ -88,6 +102,7 @@ public class PostService {
 			.userId(post.getUser().getId())
 			.userName(post.getUser().getName())
 			.viewCount(post.getViewCount())
+			.hasAttachments(post.hasAttachments())
 			.createdAt(post.getCreatedAt())
 			.updatedAt(post.getUpdatedAt())
 			.build();

@@ -19,6 +19,7 @@ public class ResponsePoseDto {
 	Long userId;
 	String userName;
 	Integer viewCount;
+	Boolean hasAttachments;
 	LocalDateTime createdAt;
 	LocalDateTime updatedAt;
 }
