@@ -12,13 +12,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @DiscriminatorValue("POST")
 @Table(
@@ -28,6 +27,15 @@ import lombok.NoArgsConstructor;
 	}
 )
 public class PostFileEntity extends FileEntity {
+
+	@Builder
+	public PostFileEntity(Long id, String originalFileName, String storedFileName, String filePath, String fileType,
+		Long fileSize, PostEntity post, Integer orders) {
+		super(id, originalFileName, storedFileName, filePath, fileType, fileSize);
+		this.post = post;
+		this.orders	= orders;
+	}
+
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "post_id", nullable = false)
 	private PostEntity post;
