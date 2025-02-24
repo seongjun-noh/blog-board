@@ -20,6 +20,7 @@ import com.example.blog_board.common.dto.ApiResponse;
 import com.example.blog_board.security.details.PrincipalDetails;
 import com.example.blog_board.service.post.PostService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,14 +31,14 @@ public class PostController {
 
 	@PostMapping(value = "/create", consumes = { "multipart/form-data" })
 	public ApiResponse createPost(@AuthenticationPrincipal PrincipalDetails principalDetails,
-								  @RequestPart("post") PostCreateRequest postData,
+								  @Valid @RequestPart("post") PostCreateRequest postData,
 								  @RequestPart(name = "files", required = false) List<MultipartFile> files
 		) {
 		Long userId = principalDetails.getId();
 
-		postService.createPost(userId, postData, files);
+		PostResponse post = postService.createPost(userId, postData, files);
 
-		return ApiResponse.success("Post created successfully.");
+		return ApiResponse.success(post);
 	}
 
 	@GetMapping()

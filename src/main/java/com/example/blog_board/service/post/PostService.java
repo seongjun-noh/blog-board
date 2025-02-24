@@ -17,6 +17,7 @@ import com.example.blog_board.domain.file.entity.PostFileEntity;
 import com.example.blog_board.domain.post.entity.PostEntity;
 import com.example.blog_board.domain.post.repository.PostRepository;
 import com.example.blog_board.domain.user.entity.UserEntity;
+import com.example.blog_board.domain.user.repository.UserRepository;
 import com.example.blog_board.service.file.PostFileService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,14 +27,18 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+	private final UserRepository userRepository;
 	private final PostRepository postRepository;
 	private final PostFileService postFileService;
 
 	@Transactional
-	public void createPost(Long userId, PostCreateRequest postData, List<MultipartFile> files) {
+	public PostResponse createPost(Long userId, PostCreateRequest postData, List<MultipartFile> files) {
+		UserEntity user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("User not found."));
+
 		// 게시글 생성
 		PostEntity newPost = PostEntity.builder()
-			.user(UserEntity.builder().id(userId).build())
+			.user(user)
 			.title(postData.getTitle())
 			.content(postData.getContent())
 			.build();
@@ -66,6 +71,18 @@ public class PostService {
 				throw new IllegalArgumentException("Failed to save files.");
 			}
 		}
+
+		return PostResponse.builder()
+				.id(savedPost.getId())
+				.title(savedPost.getTitle())
+				.content(savedPost.getContent())
+				.userId(savedPost.getUser().getId())
+				.userName(savedPost.getUser().getName())
+				.viewCount(savedPost.getViewCount())
+				.hasAttachments(savedPost.hasFiles())
+				.createdAt(savedPost.getCreatedAt())
+				.updatedAt(savedPost.getUpdatedAt())
+				.build();
 	}
 
 	@Transactional(readOnly = true)
