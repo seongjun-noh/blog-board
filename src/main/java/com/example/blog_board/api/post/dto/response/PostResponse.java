@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ResponsePoseDto {
+public class PostResponse {
 	Long id;
 	String title;
 	String content;

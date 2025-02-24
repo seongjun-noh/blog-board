@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.blog_board.api.post.dto.request.RequestPostCreateDto;
-import com.example.blog_board.api.post.dto.response.ResponsePoseDto;
+import com.example.blog_board.api.post.dto.request.PostCreateRequest;
+import com.example.blog_board.api.post.dto.response.PostResponse;
 import com.example.blog_board.common.dto.ApiResponse;
 import com.example.blog_board.security.details.PrincipalDetails;
 import com.example.blog_board.service.post.PostService;
@@ -30,7 +30,7 @@ public class PostController {
 
 	@PostMapping(value = "/create", consumes = { "multipart/form-data" })
 	public ApiResponse createPost(@AuthenticationPrincipal PrincipalDetails principalDetails,
-								  @RequestPart("post") RequestPostCreateDto postData,
+								  @RequestPart("post") PostCreateRequest postData,
 								  @RequestPart(name = "files", required = false) List<MultipartFile> files
 		) {
 		Long userId = principalDetails.getId();
@@ -41,15 +41,15 @@ public class PostController {
 	}
 
 	@GetMapping()
-	public ApiResponse<PagedModel<ResponsePoseDto>> getPosts(Pageable pageable) {
-		Page<ResponsePoseDto> posts = postService.getPosts(pageable);
+	public ApiResponse<PagedModel<PostResponse>> getPosts(Pageable pageable) {
+		Page<PostResponse> posts = postService.getPosts(pageable);
 
 		return ApiResponse.success(new PagedModel<>(posts));
 	}
 
 	@GetMapping("/{postId}")
-	public ApiResponse<ResponsePoseDto> getPost(@PathVariable(name = "postId") Long postId) {
-		ResponsePoseDto post = postService.getPost(postId);
+	public ApiResponse<PostResponse> getPost(@PathVariable(name = "postId") Long postId) {
+		PostResponse post = postService.getPost(postId);
 
 		return ApiResponse.success(post);
 	}

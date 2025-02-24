@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestRefreshTokenDto {
+public class LogoutRequest {
 	@NotBlank(message = "refreshToken is required.")
 	private String refreshToken;
 }

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.blog_board.api.post.dto.request.RequestPostCreateDto;
-import com.example.blog_board.api.post.dto.response.ResponsePoseDto;
+import com.example.blog_board.api.post.dto.request.PostCreateRequest;
+import com.example.blog_board.api.post.dto.response.PostResponse;
 import com.example.blog_board.domain.file.entity.PostFileEntity;
 import com.example.blog_board.domain.post.entity.PostEntity;
 import com.example.blog_board.domain.post.repository.PostRepository;
@@ -29,7 +29,7 @@ public class PostService {
 	private final PostFileService postFileService;
 
 	@Transactional
-	public void createPost(Long userId, RequestPostCreateDto postData, List<MultipartFile> files) {
+	public void createPost(Long userId, PostCreateRequest postData, List<MultipartFile> files) {
 		// 게시글 생성
 		PostEntity newPost = PostEntity.builder()
 			.user(UserEntity.builder().id(userId).build())
@@ -68,10 +68,10 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
-	public Page<ResponsePoseDto> getPosts(Pageable pageable) {
+	public Page<PostResponse> getPosts(Pageable pageable) {
 
 		return postRepository.findAll(pageable).map(post ->
-			ResponsePoseDto.builder()
+			PostResponse.builder()
 				.id(post.getId())
 				.title(post.getTitle())
 				.content(post.getTruncateContent(100))
@@ -86,7 +86,7 @@ public class PostService {
 	}
 
 	@Transactional
-	public ResponsePoseDto getPost(Long postId) {
+	public PostResponse getPost(Long postId) {
 		// 게시글 조회
 		PostEntity post = postRepository.findById(postId)
 			.orElseThrow(() -> new IllegalStateException("Post not found."));
@@ -95,7 +95,7 @@ public class PostService {
 		post.addViewCount();
 		postRepository.save(post);
 		
-		return ResponsePoseDto.builder()
+		return PostResponse.builder()
 			.id(post.getId())
 			.title(post.getTitle())
 			.content(post.getContent())

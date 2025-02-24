@@ -8,9 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blog_board.common.enums.UserRole;
 import com.example.blog_board.service.redis.RedisService;
-import com.example.blog_board.api.auth.dto.request.RequestLoginDto;
-import com.example.blog_board.api.auth.dto.request.RequestRefreshTokenDto;
-import com.example.blog_board.api.auth.dto.request.RequestRegisterDto;
+import com.example.blog_board.api.auth.dto.request.LoginRequest;
+import com.example.blog_board.api.auth.dto.request.TokenRefreshRequest;
+import com.example.blog_board.api.auth.dto.request.RegisterRequest;
 import com.example.blog_board.domain.user.entity.UserEntity;
 import com.example.blog_board.domain.user.repository.UserRepository;
 import com.example.blog_board.security.details.PrincipalDetails;
@@ -29,7 +29,7 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public void register(RequestRegisterDto requestBody) {
+	public void register(RegisterRequest requestBody) {
 		// 이메일 중복 체크
 		boolean isExistsEmail = userRepository.existsByEmail(requestBody.getEmail());
 		if (isExistsEmail) {
@@ -57,7 +57,7 @@ public class AuthService {
 	}
 
 	@Transactional(readOnly = true)
-	public JwtDto login(RequestLoginDto requestBody) {
+	public JwtDto login(LoginRequest requestBody) {
 		// 사용자 조회
 		UserEntity user = userRepository.findByEmail(requestBody.getEmail())
 			.orElseThrow(() -> new UsernameNotFoundException("User not found."));
@@ -99,7 +99,7 @@ public class AuthService {
 	}
 
 	@Transactional(readOnly = true)
-	public JwtDto refresh(RequestRefreshTokenDto requestBody) {
+	public JwtDto refresh(TokenRefreshRequest requestBody) {
 		String oldRefreshToken = requestBody.getRefreshToken();
 
 		// 리프레쉬 토큰 유효성 검사

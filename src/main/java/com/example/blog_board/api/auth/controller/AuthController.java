@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.blog_board.common.dto.ApiResponse;
-import com.example.blog_board.api.auth.dto.request.RequestLogoutDto;
-import com.example.blog_board.api.auth.dto.request.RequestRefreshTokenDto;
-import com.example.blog_board.api.auth.dto.request.RequestLoginDto;
-import com.example.blog_board.api.auth.dto.request.RequestRegisterDto;
+import com.example.blog_board.api.auth.dto.request.LogoutRequest;
+import com.example.blog_board.api.auth.dto.request.TokenRefreshRequest;
+import com.example.blog_board.api.auth.dto.request.LoginRequest;
+import com.example.blog_board.api.auth.dto.request.RegisterRequest;
 import com.example.blog_board.service.auth.AuthService;
 import com.example.blog_board.security.details.PrincipalDetails;
 import com.example.blog_board.security.jwt.JwtDto;
@@ -34,14 +34,14 @@ public class AuthController {
 	}
 
 	@PostMapping("/register")
-	public ApiResponse register(@Valid @RequestBody RequestRegisterDto requestBody) {
+	public ApiResponse register(@Valid @RequestBody RegisterRequest requestBody) {
 		authService.register(requestBody);
 
 		return ApiResponse.success("register");
 	}
 
 	@PostMapping("/login")
-	public ApiResponse<JwtDto> login(@Valid @RequestBody RequestLoginDto request) {
+	public ApiResponse<JwtDto> login(@Valid @RequestBody LoginRequest request) {
 		JwtDto response = authService.login(request);
 
 		return ApiResponse.success(response);
@@ -49,7 +49,7 @@ public class AuthController {
 
 	@PostMapping("/logout")
 	public ApiResponse logout(@AuthenticationPrincipal  PrincipalDetails principalDetails,
-							  @Valid @RequestBody RequestLogoutDto requestBody,
+							  @Valid @RequestBody LogoutRequest requestBody,
 							  HttpServletRequest request) {
 		// 헤더에서 액세스 토큰 추출
 		String header = request.getHeader("Authorization");
@@ -64,7 +64,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/refresh")
-	public ApiResponse<JwtDto> refresh(@Valid @RequestBody RequestRefreshTokenDto request) {
+	public ApiResponse<JwtDto> refresh(@Valid @RequestBody TokenRefreshRequest request) {
 		JwtDto response = authService.refresh(request);
 
 		return ApiResponse.success(response);

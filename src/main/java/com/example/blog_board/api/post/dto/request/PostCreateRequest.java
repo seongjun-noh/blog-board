@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestPostCreateDto {
+public class PostCreateRequest {
 	@NotBlank(message = "Title is required.")
 	private String title;
 

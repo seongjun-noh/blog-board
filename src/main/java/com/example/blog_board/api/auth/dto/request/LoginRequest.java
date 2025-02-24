@@ -10,17 +10,11 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestRegisterDto {
+public class LoginRequest {
 	@Email(message = "Invalid email format.")
 	@NotBlank(message = "Email is required")
 	private String email;
 
 	@ValidPassword
 	private String password;
-
-	@NotBlank(message = "PasswordCheck is required")
-	private String passwordCheck;
-
-	@NotBlank(message = "Name is required")
-	private String name;
 }
