@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.blog_board.api.post.dto.request.PostCreateRequest;
 import com.example.blog_board.api.post.dto.response.PostResponse;
+import com.example.blog_board.common.util.FileUtil;
 import com.example.blog_board.domain.file.entity.PostFileEntity;
 import com.example.blog_board.domain.post.entity.PostEntity;
 import com.example.blog_board.domain.post.repository.PostRepository;
@@ -58,7 +59,7 @@ public class PostService {
 			} catch (IOException e) {
 				// 파일 저장 실패 시
 				savedFiles.forEach(file ->
-					postFileService.deleteFile(file.getFilePath())
+					FileUtil.deleteLocalFile(file.getFilePath())
 				);
 
 				log.error("Failed to save files.", e);
@@ -78,7 +79,7 @@ public class PostService {
 				.userId(post.getUser().getId())
 				.userName(post.getUser().getName())
 				.viewCount(post.getViewCount())
-				.hasAttachments(post.hasAttachments())
+				.hasAttachments(post.hasFiles())
 				.createdAt(post.getCreatedAt())
 				.updatedAt(post.getUpdatedAt())
 				.build()
@@ -102,7 +103,7 @@ public class PostService {
 			.userId(post.getUser().getId())
 			.userName(post.getUser().getName())
 			.viewCount(post.getViewCount())
-			.hasAttachments(post.hasAttachments())
+			.hasAttachments(post.hasFiles())
 			.createdAt(post.getCreatedAt())
 			.updatedAt(post.getUpdatedAt())
 			.build();

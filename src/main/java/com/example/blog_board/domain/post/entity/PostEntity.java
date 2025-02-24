@@ -49,7 +49,7 @@ public class PostEntity extends BaseEntity {
 	private UserEntity user;
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
-	private List<PostFileEntity> attachments;
+	private List<PostFileEntity> files;
 
 
 	// 글 내용을 maxLength 길이만큼 자르고 ...을 붙여 반환
@@ -60,8 +60,8 @@ public class PostEntity extends BaseEntity {
 				this.content.substring(0, maxLength) + "...";
 	}
 
-	public boolean hasAttachments() {
-		return this.attachments.size() > 0;
+	public boolean hasFiles() {
+		return this.files.size() > 0;
 	}
 
 	public void addViewCount() {

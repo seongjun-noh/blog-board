@@ -1,11 +1,14 @@
 package com.example.blog_board.service.file;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.blog_board.api.file.dto.response.FileResponse;
 import com.example.blog_board.common.util.FileUtil;
 import com.example.blog_board.domain.file.entity.PostFileEntity;
 import com.example.blog_board.domain.file.repository.PostFileRepository;
@@ -36,7 +39,7 @@ public class PostFileService {
 	};
 
 
-
+	@Transactional
 	public PostFileEntity saveFile(PostEntity post, int order, MultipartFile multipartFile) throws IOException {
 		// 원본 파일명, 사이즈, MIME 타입 추출
 		String originalName = multipartFile.getOriginalFilename();
@@ -70,14 +73,40 @@ public class PostFileService {
 			.fileType(contentType)
 			.filePath(UPLOAD_DIR + "/" + storedFileName)
 			.post(post)
-			.orders(order)
 			.build();
 
 		return postFileRepository.save(fileEntity);
 	}
 
-	public void deleteFile(String filePath) {
-		FileUtil.deleteLocalFile(filePath);
+	@Transactional(readOnly = true)
+	public List<FileResponse> getFilesByPostId(Long postId) {
+		List<PostFileEntity> files = postFileRepository.findByPostId(postId);
+
+		return files.stream().map(file ->
+				FileResponse.builder()
+					.id(file.getId())
+					.originalFileName(file.getOriginalFileName())
+					.storedFileName(file.getStoredFileName())
+					.filePath(file.getFilePath())
+					.fileType(file.getFileType())
+					.fileSize(file.getFileSize())
+					.build()
+			).toList();
+	}
+
+	@Transactional(readOnly = true)
+	public FileResponse getFilesByPostIdAndStoredFileName(Long postId, String storedFileName) {
+		PostFileEntity file = postFileRepository.findByPostIdAndStoredFileName(postId, storedFileName)
+			.orElseThrow(() -> new IllegalStateException("file not found."));
+
+		return FileResponse.builder()
+				.id(file.getId())
+				.originalFileName(file.getOriginalFileName())
+				.storedFileName(file.getStoredFileName())
+				.filePath(file.getFilePath())
+				.fileType(file.getFileType())
+				.fileSize(file.getFileSize())
+				.build();
 	}
 }
 
