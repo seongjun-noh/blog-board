@@ -1,5 +1,8 @@
 package com.example.blog_board.domain.comment.entity;
 
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+
 import com.example.blog_board.common.domain.BaseEntity;
 import com.example.blog_board.domain.post.entity.PostEntity;
 import com.example.blog_board.domain.user.entity.UserEntity;
@@ -24,6 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "comments")
+@SQLDelete(sql = "UPDATE comments SET is_deleted = true WHERE id = ?")
 public class CommentEntity extends BaseEntity {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -42,4 +46,9 @@ public class CommentEntity extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_comment_id")
 	private CommentEntity parentComment;
+
+	@Column(nullable = false)
+	@ColumnDefault("false")
+	@Builder.Default
+	private Boolean isDeleted = false;
 }

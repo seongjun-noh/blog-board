@@ -38,7 +38,7 @@ public class CommentController {
 
 	@GetMapping("/posts/{postId}/comments")
 	public ApiResponse<PagedModel<CommentResponse>> getComments(@PathVariable(name = "postId") Long postId,
-														  Pageable pageable) {
+														  		Pageable pageable) {
 		Page<CommentResponse> comments = commentService.getPostComments(postId, pageable);
 
 		return ApiResponse.success(new PagedModel<>(comments));

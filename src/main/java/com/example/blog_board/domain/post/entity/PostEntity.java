@@ -3,6 +3,7 @@ package com.example.blog_board.domain.post.entity;
 import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
 
 import com.example.blog_board.common.domain.BaseEntity;
 import com.example.blog_board.domain.file.entity.PostFileEntity;
@@ -29,6 +30,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "posts")
+@SQLDelete(sql = "UPDATE posts SET is_deleted = true WHERE id = ?")
 public class PostEntity extends BaseEntity {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -50,6 +52,11 @@ public class PostEntity extends BaseEntity {
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 	private List<PostFileEntity> files;
+
+	@Column(nullable = false)
+	@ColumnDefault("false")
+	@Builder.Default
+	private Boolean isDeleted = false;
 
 
 	// 글 내용을 maxLength 길이만큼 자르고 ...을 붙여 반환
