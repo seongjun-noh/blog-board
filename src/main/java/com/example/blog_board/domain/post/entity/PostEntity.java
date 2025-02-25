@@ -54,7 +54,7 @@ public class PostEntity extends BaseEntity {
 	private List<PostFileEntity> files;
 
 	@Column(nullable = false)
-	@ColumnDefault("false")
+	@ColumnDefault("0")
 	@Builder.Default
 	private Boolean isDeleted = false;
 

@@ -19,6 +19,7 @@ import com.example.blog_board.domain.post.repository.PostRepository;
 import com.example.blog_board.domain.user.entity.UserEntity;
 import com.example.blog_board.domain.user.repository.UserRepository;
 import com.example.blog_board.service.file.PostFileService;
+import com.example.blog_board.service.post.mapper.PostMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,8 @@ public class PostService {
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
 	private final PostFileService postFileService;
+
+	private final PostMapper postMapper;
 
 	@Transactional
 	public PostResponse createPost(Long userId, PostCreateRequest postData, List<MultipartFile> files) {
@@ -72,35 +75,13 @@ public class PostService {
 			}
 		}
 
-		return PostResponse.builder()
-				.id(savedPost.getId())
-				.title(savedPost.getTitle())
-				.content(savedPost.getContent())
-				.userId(savedPost.getUser().getId())
-				.userName(savedPost.getUser().getName())
-				.viewCount(savedPost.getViewCount())
-				.hasAttachments(savedPost.hasFiles())
-				.createdAt(savedPost.getCreatedAt())
-				.updatedAt(savedPost.getUpdatedAt())
-				.build();
+		return postMapper.toDto(savedPost);
 	}
 
 	@Transactional(readOnly = true)
 	public Page<PostResponse> getPosts(Pageable pageable) {
 
-		return postRepository.findAll(pageable).map(post ->
-			PostResponse.builder()
-				.id(post.getId())
-				.title(post.getTitle())
-				.content(post.getTruncateContent(100))
-				.userId(post.getUser().getId())
-				.userName(post.getUser().getName())
-				.viewCount(post.getViewCount())
-				.hasAttachments(post.hasFiles())
-				.createdAt(post.getCreatedAt())
-				.updatedAt(post.getUpdatedAt())
-				.build()
-		);
+		return postRepository.findAll(pageable).map(postMapper::toDto);
 	}
 
 	@Transactional
@@ -111,18 +92,8 @@ public class PostService {
 
 		// 조회수 증가
 		post.addViewCount();
-		postRepository.save(post);
-		
-		return PostResponse.builder()
-			.id(post.getId())
-			.title(post.getTitle())
-			.content(post.getContent())
-			.userId(post.getUser().getId())
-			.userName(post.getUser().getName())
-			.viewCount(post.getViewCount())
-			.hasAttachments(post.hasFiles())
-			.createdAt(post.getCreatedAt())
-			.updatedAt(post.getUpdatedAt())
-			.build();
+		PostEntity updatedPost = postRepository.save(post);
+
+		return postMapper.toDto(updatedPost);
 	}
 }

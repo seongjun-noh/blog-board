@@ -19,7 +19,7 @@ public class PostResponse {
 	Long userId;
 	String userName;
 	Integer viewCount;
-	Boolean hasAttachments;
+	Boolean hasFiles;
 	LocalDateTime createdAt;
 	LocalDateTime updatedAt;
 }

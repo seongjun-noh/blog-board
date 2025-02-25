@@ -13,6 +13,7 @@ import com.example.blog_board.common.util.FileUtil;
 import com.example.blog_board.domain.file.entity.PostFileEntity;
 import com.example.blog_board.domain.file.repository.PostFileRepository;
 import com.example.blog_board.domain.post.entity.PostEntity;
+import com.example.blog_board.service.file.mapper.FileMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostFileService {
 	private final PostFileRepository postFileRepository;
+
+	private final FileMapper fileMapper;
 
 	@Value("${file.upload-dir}")
 	private String UPLOAD_DIR;
@@ -82,16 +85,7 @@ public class PostFileService {
 	public List<FileResponse> getFilesByPostId(Long postId) {
 		List<PostFileEntity> files = postFileRepository.findByPostId(postId);
 
-		return files.stream().map(file ->
-				FileResponse.builder()
-					.id(file.getId())
-					.originalFileName(file.getOriginalFileName())
-					.storedFileName(file.getStoredFileName())
-					.filePath(file.getFilePath())
-					.fileType(file.getFileType())
-					.fileSize(file.getFileSize())
-					.build()
-			).toList();
+		return files.stream().map(fileMapper::toDto).toList();
 	}
 
 	@Transactional(readOnly = true)
@@ -99,14 +93,7 @@ public class PostFileService {
 		PostFileEntity file = postFileRepository.findByPostIdAndStoredFileName(postId, storedFileName)
 			.orElseThrow(() -> new IllegalStateException("file not found."));
 
-		return FileResponse.builder()
-				.id(file.getId())
-				.originalFileName(file.getOriginalFileName())
-				.storedFileName(file.getStoredFileName())
-				.filePath(file.getFilePath())
-				.fileType(file.getFileType())
-				.fileSize(file.getFileSize())
-				.build();
+		return fileMapper.toDto(file);
 	}
 }
 
