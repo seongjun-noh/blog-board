@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blog_board.api.comment.dto.CommentCreateRequest;
 import com.example.blog_board.api.comment.dto.response.CommentResponse;
+import com.example.blog_board.common.enums.UserRole;
 import com.example.blog_board.domain.comment.entity.CommentEntity;
 import com.example.blog_board.domain.comment.repository.CommentRepository;
 import com.example.blog_board.domain.post.entity.PostEntity;
@@ -55,5 +56,17 @@ public class CommentService {
 
 	public Page<CommentResponse> getPostComments(Long postId, Pageable pageable) {
 		return commentRepository.findAllByPostId(postId, pageable).map(commentMapper::toDto);
+	}
+
+	public void deleteComment(Long userId, UserRole role, Long postId, Long commentId) {
+
+		CommentEntity comment = commentRepository.findByIdAndPostId(commentId, postId)
+			.orElseThrow(() -> new IllegalStateException("Comment not found."));
+
+		if (UserRole.ADMIN != role && comment.getUser().getId() != userId) {
+			throw new IllegalStateException("Access denied.");
+		}
+
+		commentRepository.delete(comment);
 	}
 }

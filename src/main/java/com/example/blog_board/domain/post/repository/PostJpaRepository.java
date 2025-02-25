@@ -16,6 +16,10 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, Post
 	Optional<PostEntity> findById(Long postId);
 
 	@Override
+	@Query("SELECT p FROM PostEntity p WHERE p.id = :postId AND p.user.id = :userId AND p.isDeleted = false")
+	Optional<PostEntity> findByIdAndUserId(Long postId, Long userId);
+
+	@Override
 	@Query("SELECT p FROM PostEntity p WHERE p.isDeleted = false")
 	Page<PostEntity> findAll(Pageable pageable);
 }

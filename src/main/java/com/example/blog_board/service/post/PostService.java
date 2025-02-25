@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.blog_board.api.post.dto.request.PostCreateRequest;
 import com.example.blog_board.api.post.dto.response.PostResponse;
+import com.example.blog_board.common.enums.UserRole;
 import com.example.blog_board.common.util.FileUtil;
 import com.example.blog_board.domain.file.entity.PostFileEntity;
 import com.example.blog_board.domain.post.entity.PostEntity;
@@ -95,5 +96,16 @@ public class PostService {
 		PostEntity updatedPost = postRepository.save(post);
 
 		return postMapper.toDto(updatedPost);
+	}
+
+	public void deleteUserPost(Long userId, UserRole role, Long postId) {
+		PostEntity post = postRepository.findById(postId)
+			.orElseThrow(() -> new IllegalStateException("Post not found."));
+
+		if (UserRole.ADMIN != role && post.getUser().getId() != userId) {
+			throw new IllegalStateException("Access denied.");
+		}
+
+		postRepository.delete(post);
 	}
 }

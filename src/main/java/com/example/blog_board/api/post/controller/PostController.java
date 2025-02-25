@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.blog_board.api.post.dto.request.PostCreateRequest;
 import com.example.blog_board.api.post.dto.response.PostResponse;
 import com.example.blog_board.common.dto.ApiResponse;
+import com.example.blog_board.common.enums.UserRole;
 import com.example.blog_board.security.details.PrincipalDetails;
 import com.example.blog_board.service.post.PostService;
 
@@ -53,5 +55,16 @@ public class PostController {
 		PostResponse post = postService.getPost(postId);
 
 		return ApiResponse.success(post);
+	}
+
+	@DeleteMapping("/{postId}")
+	public ApiResponse deletePost(@AuthenticationPrincipal PrincipalDetails principalDetails,
+								  @PathVariable(name = "postId") Long postId) {
+		Long userId = principalDetails.getId();
+		UserRole userRole = principalDetails.getRole();
+
+		postService.deleteUserPost(userId, userRole, postId);
+
+		return ApiResponse.success("Post deleted.");
 	}
 }

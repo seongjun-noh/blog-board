@@ -10,9 +10,13 @@ import com.example.blog_board.domain.post.entity.PostEntity;
 
 @Repository
 public interface PostRepository {
-	Optional<PostEntity> findById(Long postId);
+	Optional<PostEntity> findById(Long id);
+
+	Optional<PostEntity> findByIdAndUserId(Long postId, Long userId);
 
 	Page<PostEntity> findAll(Pageable pageable);
 
 	PostEntity save(PostEntity post);
+
+	void delete(PostEntity post);
 }

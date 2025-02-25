@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.blog_board.api.comment.dto.CommentCreateRequest;
 import com.example.blog_board.api.comment.dto.response.CommentResponse;
 import com.example.blog_board.common.dto.ApiResponse;
+import com.example.blog_board.common.enums.UserRole;
 import com.example.blog_board.security.details.PrincipalDetails;
 import com.example.blog_board.service.comment.CommentService;
 
@@ -42,5 +44,17 @@ public class CommentController {
 		Page<CommentResponse> comments = commentService.getPostComments(postId, pageable);
 
 		return ApiResponse.success(new PagedModel<>(comments));
+	}
+
+	@DeleteMapping("/posts/{postId}/comments/{commentId}")
+	public ApiResponse deleteComment(@AuthenticationPrincipal PrincipalDetails principalDetails,
+								  	 @PathVariable(name = "postId") Long postId,
+								  	 @PathVariable(name = "commentId") Long commentId) {
+		Long userId = principalDetails.getId();
+		UserRole role = principalDetails.getRole();
+
+		commentService.deleteComment(userId, role, postId, commentId);
+
+		return ApiResponse.success("Comment deleted.");
 	}
 }

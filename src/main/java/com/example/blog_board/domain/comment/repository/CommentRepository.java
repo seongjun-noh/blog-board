@@ -15,4 +15,6 @@ public interface CommentRepository{
 	Page<CommentEntity> findAllByPostId(Long postId, Pageable pageable);
 
 	CommentEntity save(CommentEntity newComment);
+
+	void delete(CommentEntity comment);
 }
