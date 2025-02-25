@@ -54,10 +54,12 @@ public class CommentService {
 		return commentMapper.toDto(savedComment);
 	}
 
+	@Transactional(readOnly = true)
 	public Page<CommentResponse> getPostComments(Long postId, Pageable pageable) {
 		return commentRepository.findAllByPostId(postId, pageable).map(commentMapper::toDto);
 	}
 
+	@Transactional
 	public void deleteComment(Long userId, UserRole role, Long postId, Long commentId) {
 
 		CommentEntity comment = commentRepository.findByIdAndPostId(commentId, postId)

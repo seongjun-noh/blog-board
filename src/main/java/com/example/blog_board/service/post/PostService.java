@@ -98,6 +98,7 @@ public class PostService {
 		return postMapper.toDto(updatedPost);
 	}
 
+	@Transactional
 	public void deleteUserPost(Long userId, UserRole role, Long postId) {
 		PostEntity post = postRepository.findById(postId)
 			.orElseThrow(() -> new IllegalStateException("Post not found."));
