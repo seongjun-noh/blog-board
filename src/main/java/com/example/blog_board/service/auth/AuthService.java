@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blog_board.common.enums.UserRole;
+import com.example.blog_board.common.error.exception.BadRequestException;
+import com.example.blog_board.common.error.exception.ConflictException;
 import com.example.blog_board.service.redis.RedisService;
 import com.example.blog_board.api.auth.dto.request.LoginRequest;
 import com.example.blog_board.api.auth.dto.request.TokenRefreshRequest;
@@ -33,12 +35,12 @@ public class AuthService {
 		// 이메일 중복 체크
 		boolean isExistsEmail = userRepository.existsByEmail(requestBody.getEmail());
 		if (isExistsEmail) {
-			throw new IllegalArgumentException("Email already exists.");
+			throw new ConflictException("Email already exists.");
 		}
 
 		// 비밀번호 확인
 		if (!requestBody.getPassword().equals(requestBody.getPasswordCheck())) {
-			throw new IllegalArgumentException("Password does not match.");
+			throw new BadRequestException("Password does not match.");
 		}
 
 		// 비밀번호 암호화
@@ -105,7 +107,7 @@ public class AuthService {
 		// 리프레쉬 토큰 유효성 검사
 		Claims oldRefreshTokenClaims = jwtUtil.parseToken(oldRefreshToken);
 		if (oldRefreshTokenClaims == null || !jwtUtil.isRefreshToken(oldRefreshTokenClaims) || redisService.isBlacklisted(oldRefreshToken)) {
-			throw new IllegalArgumentException("Invalid refresh token.");
+			throw new BadRequestException("Invalid refresh token.");
 		}
 
 		String email = jwtUtil.getUsername(oldRefreshTokenClaims);
@@ -113,7 +115,7 @@ public class AuthService {
 		// 리프레쉬 토큰 검사
 		String storedRefreshToken = redisService.getRefreshToken(email);
 		if (storedRefreshToken == null || !oldRefreshToken.equals(storedRefreshToken)) {
-			throw new IllegalArgumentException("Invalid or expired refresh token.");
+			throw new BadRequestException("Invalid or expired refresh token.");
 		}
 
 		// 사용자 조회

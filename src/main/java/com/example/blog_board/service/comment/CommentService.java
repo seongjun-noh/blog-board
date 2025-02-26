@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.blog_board.api.comment.dto.CommentCreateRequest;
 import com.example.blog_board.api.comment.dto.response.CommentResponse;
 import com.example.blog_board.common.enums.UserRole;
+import com.example.blog_board.common.error.exception.ForbiddenException;
+import com.example.blog_board.common.error.exception.NotFoundException;
 import com.example.blog_board.domain.comment.entity.CommentEntity;
 import com.example.blog_board.domain.comment.repository.CommentRepository;
 import com.example.blog_board.domain.post.entity.PostEntity;
@@ -30,16 +32,16 @@ public class CommentService {
 	@Transactional
 	public CommentResponse createComment(Long userId, Long postId, CommentCreateRequest requestBody) {
 		UserEntity user = userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("User not found."));
+			.orElseThrow(() -> new NotFoundException("User not found."));
 
 		PostEntity post = postRepository.findById(postId)
-			.orElseThrow(() -> new IllegalArgumentException("Post not found."));
+			.orElseThrow(() -> new NotFoundException("Post not found."));
 
 		CommentEntity parentComment = null;
 		Long parentCommentId = requestBody.getParentCommentId();
 		if (parentCommentId != null) {
 			parentComment = commentRepository.findByIdAndPostId(parentCommentId, postId)
-				.orElseThrow(() -> new IllegalArgumentException("Parent comment not found."));
+				.orElseThrow(() -> new NotFoundException("Parent comment not found."));
 		}
 
 		CommentEntity newComment = CommentEntity.builder()
@@ -63,10 +65,10 @@ public class CommentService {
 	public void deleteComment(Long userId, UserRole role, Long postId, Long commentId) {
 
 		CommentEntity comment = commentRepository.findByIdAndPostId(commentId, postId)
-			.orElseThrow(() -> new IllegalStateException("Comment not found."));
+			.orElseThrow(() -> new NotFoundException("Comment not found."));
 
 		if (UserRole.ADMIN != role && comment.getUser().getId() != userId) {
-			throw new IllegalStateException("Access denied.");
+			throw new ForbiddenException("Access denied.");
 		}
 
 		commentRepository.delete(comment);

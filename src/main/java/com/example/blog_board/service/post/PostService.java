@@ -13,6 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.blog_board.api.post.dto.request.PostCreateRequest;
 import com.example.blog_board.api.post.dto.response.PostResponse;
 import com.example.blog_board.common.enums.UserRole;
+import com.example.blog_board.common.error.exception.ForbiddenException;
+import com.example.blog_board.common.error.exception.InternalServerErrorException;
+import com.example.blog_board.common.error.exception.NotFoundException;
 import com.example.blog_board.common.util.FileUtil;
 import com.example.blog_board.domain.file.entity.PostFileEntity;
 import com.example.blog_board.domain.post.entity.PostEntity;
@@ -38,7 +41,7 @@ public class PostService {
 	@Transactional
 	public PostResponse createPost(Long userId, PostCreateRequest postData, List<MultipartFile> files) {
 		UserEntity user = userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("User not found."));
+			.orElseThrow(() -> new NotFoundException("User not found."));
 
 		// 게시글 생성
 		PostEntity newPost = PostEntity.builder()
@@ -72,7 +75,7 @@ public class PostService {
 				);
 
 				log.error("Failed to save files.", e);
-				throw new IllegalArgumentException("Failed to save files.");
+				throw new InternalServerErrorException("Failed to save files.");
 			}
 		}
 
@@ -89,7 +92,7 @@ public class PostService {
 	public PostResponse getPost(Long postId) {
 		// 게시글 조회
 		PostEntity post = postRepository.findById(postId)
-			.orElseThrow(() -> new IllegalStateException("Post not found."));
+			.orElseThrow(() -> new NotFoundException("Post not found."));
 
 		// 조회수 증가
 		post.addViewCount();
@@ -101,10 +104,10 @@ public class PostService {
 	@Transactional
 	public void deleteUserPost(Long userId, UserRole role, Long postId) {
 		PostEntity post = postRepository.findById(postId)
-			.orElseThrow(() -> new IllegalStateException("Post not found."));
+			.orElseThrow(() -> new NotFoundException("Post not found."));
 
 		if (UserRole.ADMIN != role && post.getUser().getId() != userId) {
-			throw new IllegalStateException("Access denied.");
+			throw new ForbiddenException("Access denied.");
 		}
 
 		postRepository.delete(post);

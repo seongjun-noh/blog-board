@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.blog_board.api.file.dto.response.FileResponse;
+import com.example.blog_board.common.error.exception.BadRequestException;
+import com.example.blog_board.common.error.exception.NotFoundException;
 import com.example.blog_board.common.util.FileUtil;
 import com.example.blog_board.domain.file.entity.PostFileEntity;
 import com.example.blog_board.domain.file.repository.PostFileRepository;
@@ -51,12 +53,12 @@ public class PostFileService {
 
 		// 파일 형식 검증
 		if (FileUtil.isValidContentType(contentType, blacklistedMimeTypes)) {
-			throw new IllegalArgumentException("Invalid file type.");
+			throw new BadRequestException("Invalid file type.");
 		}
 
 		// 파일 크기 검증
 		if (size > MAX_FILE_SIZE) {
-			throw new IllegalArgumentException("File size exceeds the limit.");
+			throw new BadRequestException("File size exceeds the limit.");
 		}
 
 		// 저장 파일명 생성
@@ -91,7 +93,7 @@ public class PostFileService {
 	@Transactional(readOnly = true)
 	public FileResponse getFilesByPostIdAndStoredFileName(Long postId, String storedFileName) {
 		PostFileEntity file = postFileRepository.findByPostIdAndStoredFileName(postId, storedFileName)
-			.orElseThrow(() -> new IllegalStateException("file not found."));
+			.orElseThrow(() -> new NotFoundException("file not found."));
 
 		return fileMapper.toDto(file);
 	}
