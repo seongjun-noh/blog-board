@@ -1,6 +1,7 @@
 package com.example.blog_board.service.file;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.blog_board.api.file.dto.response.FileResponse;
 import com.example.blog_board.common.error.exception.BadRequestException;
+import com.example.blog_board.common.error.exception.InternalServerErrorException;
 import com.example.blog_board.common.error.exception.NotFoundException;
 import com.example.blog_board.common.util.FileUtil;
 import com.example.blog_board.domain.file.entity.PostFileEntity;
@@ -18,7 +20,9 @@ import com.example.blog_board.domain.post.entity.PostEntity;
 import com.example.blog_board.service.file.mapper.FileMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostFileService {
@@ -45,7 +49,7 @@ public class PostFileService {
 
 
 	@Transactional
-	public PostFileEntity saveFile(PostEntity post, int order, MultipartFile multipartFile) throws IOException {
+	public PostFileEntity saveFile(PostEntity post, MultipartFile multipartFile) throws IOException {
 		// 원본 파일명, 사이즈, MIME 타입 추출
 		String originalName = multipartFile.getOriginalFilename();
 		long size = multipartFile.getSize();
@@ -83,6 +87,34 @@ public class PostFileService {
 		return postFileRepository.save(fileEntity);
 	}
 
+	@Transactional
+	public void saveFiles(PostEntity post, List<MultipartFile> files) {
+		if (files != null && !files.isEmpty()) {
+			List<PostFileEntity> savedFiles = new ArrayList<>();
+
+			try {
+				for (MultipartFile file : files) {
+					if (file.isEmpty()) {
+						continue;
+					}
+
+					PostFileEntity savedFile = this.saveFile(post, file);
+					savedFiles.add(savedFile);
+				}
+			} catch (IOException e) {
+				// 파일 저장 실패 시
+				savedFiles.forEach(file ->
+					FileUtil.deleteLocalFile(file.getFilePath())
+				);
+
+				log.error("Failed to save files.", e);
+				throw new InternalServerErrorException("Failed to save files.");
+			}
+
+			postFileRepository.saveAll(savedFiles);
+		}
+	}
+
 	@Transactional(readOnly = true)
 	public List<FileResponse> getFilesByPostId(Long postId) {
 		List<PostFileEntity> files = postFileRepository.findByPostId(postId);
@@ -96,6 +128,17 @@ public class PostFileService {
 			.orElseThrow(() -> new NotFoundException("file not found."));
 
 		return fileMapper.toDto(file);
+	}
+
+	@Transactional
+	public void deleteFileByPostIdAndFileName(Long postId, String fileName) {
+		postFileRepository.findByPostIdAndStoredFileName(postId, fileName)
+			.ifPresent(file -> {
+				postFileRepository.delete(file);
+
+				// TODO 임시 폴더로 이동 후 트랜잭션이 실패 시 복구, 성공 시 삭제
+				FileUtil.deleteLocalFile(fileName);
+			});
 	}
 }
 

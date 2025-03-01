@@ -51,4 +51,8 @@ public class CommentEntity extends BaseEntity {
 	@ColumnDefault("0")
 	@Builder.Default
 	private Boolean isDeleted = false;
+
+	public void updateContent(String content) {
+		this.content = content;
+	}
 }

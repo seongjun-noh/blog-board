@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.blog_board.api.comment.dto.CommentCreateRequest;
+import com.example.blog_board.api.comment.dto.request.CommentCreateRequest;
+import com.example.blog_board.api.comment.dto.request.CommentUpdateRequest;
 import com.example.blog_board.api.comment.dto.response.CommentResponse;
 import com.example.blog_board.common.dto.ApiResponse;
 import com.example.blog_board.common.enums.UserRole;
@@ -44,6 +46,17 @@ public class CommentController {
 		Page<CommentResponse> comments = commentService.getPostComments(postId, pageable);
 
 		return ApiResponse.success(new PagedModel<>(comments));
+	}
+
+	@PutMapping("/posts/{postId}/comments/{commentId}")
+	public ApiResponse<CommentResponse> updateComment(@AuthenticationPrincipal PrincipalDetails principalDetails,
+													  @PathVariable(name = "postId") Long postId,
+													  @PathVariable(name = "commentId") Long commentId,
+													  @Valid @RequestBody CommentUpdateRequest requestBody) {
+		Long userId = principalDetails.getId();
+		CommentResponse comment = commentService.updateComment(userId, postId, commentId, requestBody);
+
+		return ApiResponse.success(comment);
 	}
 
 	@DeleteMapping("/posts/{postId}/comments/{commentId}")

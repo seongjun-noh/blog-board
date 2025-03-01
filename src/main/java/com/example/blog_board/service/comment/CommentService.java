@@ -5,7 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.blog_board.api.comment.dto.CommentCreateRequest;
+import com.example.blog_board.api.comment.dto.request.CommentCreateRequest;
+import com.example.blog_board.api.comment.dto.request.CommentUpdateRequest;
 import com.example.blog_board.api.comment.dto.response.CommentResponse;
 import com.example.blog_board.common.enums.UserRole;
 import com.example.blog_board.common.error.exception.ForbiddenException;
@@ -59,6 +60,18 @@ public class CommentService {
 	@Transactional(readOnly = true)
 	public Page<CommentResponse> getPostComments(Long postId, Pageable pageable) {
 		return commentRepository.findAllByPostId(postId, pageable).map(commentMapper::toDto);
+	}
+
+	@Transactional
+	public CommentResponse updateComment(Long userId, Long postId, Long commentId, CommentUpdateRequest requestBody) {
+		CommentEntity comment = commentRepository.findByIdAndPostIdAndUserId(commentId, postId, userId)
+			.orElseThrow(() -> new NotFoundException("Comment not found."));
+
+		comment.updateContent(requestBody.getContent());
+
+		CommentEntity updatedComment = commentRepository.save(comment);
+
+		return commentMapper.toDto(updatedComment);
 	}
 
 	@Transactional

@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.blog_board.api.post.dto.request.PostCreateRequest;
+import com.example.blog_board.api.post.dto.request.PostUpdateRequest;
 import com.example.blog_board.api.post.dto.response.PostResponse;
 import com.example.blog_board.common.dto.ApiResponse;
 import com.example.blog_board.common.enums.UserRole;
@@ -53,6 +55,19 @@ public class PostController {
 	@GetMapping("/{postId}")
 	public ApiResponse<PostResponse> getPost(@PathVariable(name = "postId") Long postId) {
 		PostResponse post = postService.getPost(postId);
+
+		return ApiResponse.success(post);
+	}
+
+	@PutMapping(value = "/{postId}/update", consumes = { "multipart/form-data" })
+	public ApiResponse updatePost(@AuthenticationPrincipal PrincipalDetails principalDetails,
+								  @PathVariable(name = "postId") Long postId,
+								  @Valid @RequestPart("post") PostUpdateRequest postData,
+								  @RequestPart(name = "files", required = false) List<MultipartFile> files
+	) {
+		Long userId = principalDetails.getId();
+
+		PostResponse post = postService.updatePost(userId, postId, postData, files);
 
 		return ApiResponse.success(post);
 	}
