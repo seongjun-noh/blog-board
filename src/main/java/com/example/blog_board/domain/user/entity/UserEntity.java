@@ -47,4 +47,8 @@ public class UserEntity extends BaseEntity {
 	private UserRole role;
 
 	private String profileImage;
+
+	public void updateName(String name) {
+		this.name = name;
+	}
 }

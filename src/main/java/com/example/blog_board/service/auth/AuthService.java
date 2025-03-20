@@ -6,18 +6,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.blog_board.api.auth.dto.request.LoginRequest;
+import com.example.blog_board.api.auth.dto.request.RegisterRequest;
+import com.example.blog_board.api.auth.dto.request.TokenRefreshRequest;
 import com.example.blog_board.common.enums.UserRole;
 import com.example.blog_board.common.error.exception.BadRequestException;
 import com.example.blog_board.common.error.exception.ConflictException;
-import com.example.blog_board.service.redis.RedisService;
-import com.example.blog_board.api.auth.dto.request.LoginRequest;
-import com.example.blog_board.api.auth.dto.request.TokenRefreshRequest;
-import com.example.blog_board.api.auth.dto.request.RegisterRequest;
 import com.example.blog_board.domain.user.entity.UserEntity;
 import com.example.blog_board.domain.user.repository.UserRepository;
 import com.example.blog_board.security.details.PrincipalDetails;
 import com.example.blog_board.security.jwt.JwtDto;
 import com.example.blog_board.security.jwt.JwtUtil;
+import com.example.blog_board.service.redis.RedisService;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;

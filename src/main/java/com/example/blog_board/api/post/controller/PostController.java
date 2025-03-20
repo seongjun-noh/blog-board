@@ -62,7 +62,7 @@ public class PostController {
 	@PutMapping(value = "/{postId}/update", consumes = { "multipart/form-data" })
 	public ApiResponse updatePost(@AuthenticationPrincipal PrincipalDetails principalDetails,
 								  @PathVariable(name = "postId") Long postId,
-								  @Valid @RequestPart("post") PostUpdateRequest postData,
+								  @Valid @RequestPart("postData") PostUpdateRequest postData,
 								  @RequestPart(name = "files", required = false) List<MultipartFile> files
 	) {
 		Long userId = principalDetails.getId();
